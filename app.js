@@ -1,33 +1,27 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const cors = require('cors');
-require('dotenv').config(); // dotenv frühzeitig laden
+const dotenv = require('dotenv');
+const synthDataRoutes = require('./src/routes/routesSynthData');
+
+dotenv.config();
 
 const app = express();
 
-// Middleware
 app.use(bodyParser.json());
-app.use(cors());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// Import routes
-const synthDataRoutes = require('./src/routes/routesSynthData');
+mongoose.connect(process.env.DATABASE_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
-// Use routes
-app.use('/api/synthdata', synthDataRoutes);
+const db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function () {
+    console.log('Connected to the database');
+});
 
-const databaseUri = process.env.DATABASE_URI;
-console.log('DATABASE_URI:', databaseUri); // Debug-Ausgabe hinzufügen
+app.use('/synthdata', synthDataRoutes);
 
-if (!databaseUri) {
-    throw new Error('DATABASE_URI is not defined');
-}
-
-mongoose.connect(databaseUri, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => {
-        console.log('Connected to MongoDB');
-        app.listen(3000, () => {
-            console.log('Server is running on port 3000');
-        });
-    })
-    .catch(error => console.log(error));
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
