@@ -18,11 +18,11 @@ router.post('/save', async (req, res) => {
     }
 });
 
-// Route to load synth data
-router.get('/load/:name', async (req, res) => {
-    const { name } = req.params;
+// Route to load synth data by ID
+router.get('/load/:id', async (req, res) => {
+    const { id } = req.params;
     try {
-        const synthData = await SynthData.findOne({ name });
+        const synthData = await SynthData.findById(id);
         if (synthData) {
             res.status(200).send(synthData);
         } else {
