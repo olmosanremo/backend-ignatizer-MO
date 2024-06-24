@@ -2,16 +2,18 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
+const cors = require('cors');
 const synthDataRoutes = require('./src/routes/routesSynthData');
 
 dotenv.config();
 
 const app = express();
 
+app.use(cors());  // Füge diese Zeile hinzu
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-mongoose.connect(process.env.DATABASE_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(process.env.DATABASE_URI);
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
